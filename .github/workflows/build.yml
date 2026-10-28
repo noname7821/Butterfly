@@ -1,0 +1,32 @@
+name: Build Butterfly deb
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Theos deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y make clang git curl libplist-dev libssl-dev \
+            libstdc++-12-dev libncurses-dev zlib1g-dev fakeroot dpkg
+          git clone --recursive https://github.com/theos/theos.git $HOME/theos
+          curl -L https://github.com/theos/sdks/archive/master.tar.gz | tar xz -C /tmp
+          mv /tmp/sdks-master/iPhoneOS16.5.sdk $HOME/theos/sdks/ || \
+          mv /tmp/sdks-master/iPhoneOS15.6.sdk $HOME/theos/sdks/
+
+      - name: Build
+        run: |
+          export THEOS=$HOME/theos
+          export PATH=$THEOS/bin:$PATH
+          make package FINALPACKAGE=1
+
+      - name: Upload deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: butterfly-deb
+          path: packages/*.deb

@@ -1,0 +1,9 @@
+Package: com.niche.butterfly
+Name: Butterfly
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: Butterfly - BLE proximity spam (iOS/Android/Windows modes) with Credits.
+Maintainer: palofsc
+Author: palofsc
+Section: Tweaks
+Depends: mobilesubstrate, firmware (>= 14.0)
