@@ -21,7 +21,6 @@ jobs:
           
           if [ ! -x "$HOME/theos/toolchain/linux/iphone/bin/clang" ]; then
             echo "ERROR: clang still missing after installer"
-            find $HOME/theos -maxdepth 3 -type d | head -50
             exit 1
           fi
           
@@ -31,14 +30,15 @@ jobs:
           tar -xJf /tmp/sdk.tar.xz -C $HOME/theos/sdks
           rm /tmp/sdk.tar.xz
 
-      - name: Build
+      - name: Build Rootless
         run: |
           export THEOS=$HOME/theos
           export PATH=$THEOS/bin:$PATH
-          make package FINALPACKAGE=1
+          make clean
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
 
       - name: Upload deb
         uses: actions/upload-artifact@v4
         with:
-          name: butterfly-deb
+          name: butterfly-deb-rootless
           path: packages/*.deb
