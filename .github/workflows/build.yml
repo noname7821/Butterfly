@@ -14,20 +14,21 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y make clang git curl libplist-dev libssl-dev \
             libstdc++-12-dev libncurses-dev zlib1g-dev fakeroot dpkg xz-utils
-          git clone --recursive https://github.com/theos/theos.git $HOME/theos
+          
+          export THEOS=$HOME/theos
+          CI=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
+          
+          if [ ! -x "$HOME/theos/toolchain/linux/iphone/bin/clang" ]; then
+            echo "ERROR: Theos toolchain not installed correctly."
+            ls -la "$HOME/theos/toolchain/linux/iphone/bin/" || true
+            exit 1
+          fi
+          
           mkdir -p $HOME/theos/sdks
           curl -L -f -o /tmp/sdk.tar.xz \
             "https://github.com/theos/sdks/releases/download/master-146e41f/iPhoneOS16.5.sdk.tar.xz"
-          if [ ! -s /tmp/sdk.tar.xz ]; then
-            echo "ERROR: SDK download failed or file is empty."
-            exit 1
-          fi
           tar -xJf /tmp/sdk.tar.xz -C $HOME/theos/sdks
           rm /tmp/sdk.tar.xz
-          if [ ! -d "$HOME/theos/sdks/iPhoneOS16.5.sdk" ]; then
-            echo "ERROR: SDK extraction failed."
-            exit 1
-          fi
 
       - name: Build
         run: |
